@@ -3,13 +3,25 @@
 <div class="filters-container">
   <h3>Filtros</h3>
   <div class="filter-group">
-    <label for="sensorType">Tipo de Sensor:</label>
-    <input type="text" id="sensorType" [(ngModel)]="filterSensorType" placeholder="Ej: temperatura, humedad">
+    <label for="sensorTypeSelect">Tipo de Sensor:</label>
+    <select id="sensorTypeSelect" [(ngModel)]="filterSensorType" [disabled]="isLoadingTags">
+      <option value="">Todos</option>
+      <option *ngFor="let type of availableSensorTypes" [value]="type">{{ type }}</option>
+    </select>
+    <div *ngIf="isLoadingTags && availableSensorTypes.length === 0" class="filter-loading-text">Cargando tipos...</div>
+    <div *ngIf="tagsError && availableSensorTypes.length === 0 && !isLoadingTags" class="filter-error-text">{{ tagsError }}</div>
   </div>
+
   <div class="filter-group">
-    <label for="location">Ubicación:</label>
-    <input type="text" id="location" [(ngModel)]="filterLocation" placeholder="Ej: sala1, exterior">
+    <label for="locationSelect">Ubicación:</label>
+    <select id="locationSelect" [(ngModel)]="filterLocation" [disabled]="isLoadingTags">
+      <option value="">Todas</option>
+      <option *ngFor="let loc of availableLocations" [value]="loc">{{ loc }}</option>
+    </select>
+    <div *ngIf="isLoadingTags && availableLocations.length === 0" class="filter-loading-text">Cargando ubicaciones...</div>
+    <div *ngIf="tagsError && availableLocations.length === 0 && !isLoadingTags" class="filter-error-text">{{ tagsError }}</div>
   </div>
+
   <div class="filter-group">
     <label for="startDate">Fecha Inicio:</label>
     <input type="date" id="startDate" [(ngModel)]="filterStartDate">
@@ -19,28 +31,63 @@
     <input type="date" id="endDate" [(ngModel)]="filterEndDate">
   </div>
   <div class="filter-actions">
-    <button (click)="applyFilters()">Aplicar Filtros</button>
-    <button (click)="clearFilters()" class="clear-button">Limpiar Filtros</button>
+    <button (click)="applyFilters()" [disabled]="isLoading || isLoadingTags">Aplicar Filtros</button>
+    <button (click)="clearFilters()" class="clear-button" [disabled]="isLoading || isLoadingTags">Limpiar Filtros</button>
   </div>
 </div>
 
-<div *ngIf="isLoading" class="loading-indicator">Cargando datos...</div>
-<div *ngIf="error" class="error-message">
-  Error al cargar datos: {{ error }}
+<div *ngIf="isLoading && !isLoadingTags" class="loading-indicator">Cargando datos de sensores...</div>
+<div *ngIf="error && !isLoading" class="error-message"> 
+  Error al cargar datos de sensores: {{ error }}
 </div>
 
 <div *ngIf="!isLoading && !error">
-  <h3>Gráfico de Datos del Sensor</h3>
-  <div class="chart-wrapper" *ngIf="sensorData.length > 0">
-    <canvas baseChart
-            [data]="lineChartData"
-            [options]="lineChartOptions"
-            [type]="lineChartType">
-    </canvas>
-  </div>
-  <p *ngIf="sensorData.length === 0" class="no-data-message">No hay datos para mostrar en el gráfico con los filtros actuales.</p>
+  <div *ngIf="isMultiChartView" class="multi-chart-view">
+    <h3 *ngIf="locationCharts.length > 0 || allLocationKeysForPaging.length > 0">Visualización por Ubicación y Tipo de Sensor</h3>
+    
+    <div *ngFor="let locChart of locationCharts" class="location-chart-container">
+      <h4>Ubicación: {{ locChart.locationName }}</h4>
+      <div class="chart-wrapper">
+        <canvas baseChart
+                [data]="locChart.chartDataConfig"
+                [options]="locChart.chartOptionsConfig"
+                [type]="lineChartType">
+        </canvas>
+      </div>
+    </div>
 
-  <h3>Tabla de Datos del Sensor</h3>
+    <div class="pagination-controls" *ngIf="totalPages > 1">
+      <button (click)="previousPage()" [disabled]="currentPage === 1">Anterior</button>
+      <span class="page-info">
+        Página 
+        <select class="page-select" [ngModel]="currentPage" (ngModelChange)="goToPage($event)" title="Ir a página">
+          <option *ngFor="let page of getPages()" [value]="page">{{ page }}</option>
+        </select>
+        de {{ totalPages }}
+      </span>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages">Siguiente</button>
+    </div>
+     <p *ngIf="allLocationKeysForPaging.length === 0 && sensorData.length > 0" class="no-data-message">
+      No hay datos de ubicación para mostrar en vista múltiple con los filtros de fecha actuales.
+    </p>
+  </div>
+
+  <div *ngIf="!isMultiChartView && singleLineChartData.datasets && singleLineChartData.datasets.length > 0 && singleLineChartData.datasets[0] && singleLineChartData.datasets[0].data && singleLineChartData.datasets[0].data.length > 0" class="single-chart-view">
+    <h3>Gráfico de Datos Filtrados</h3>
+    <div class="chart-wrapper">
+      <canvas baseChart
+              [data]="singleLineChartData"
+              [options]="commonLineChartOptions"
+              [type]="lineChartType">
+      </canvas>
+    </div>
+  </div>
+
+  <p *ngIf="sensorData.length === 0 && !isLoading" class="no-data-message">
+    No hay datos para mostrar con los filtros actuales.
+  </p>
+  
+  <h3 *ngIf="sensorData.length > 0">Tabla de Datos del Sensor ({{ sensorData.length }} registros)</h3>
   <div *ngIf="sensorData.length > 0" class="table-container">
     <table>
       <thead>
@@ -65,5 +112,4 @@
       </tbody>
     </table>
   </div>
-  <p *ngIf="sensorData.length === 0" class="no-data-message">No hay datos de sensores para mostrar en la tabla con los filtros actuales.</p>
 </div>

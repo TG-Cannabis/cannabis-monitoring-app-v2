@@ -4,60 +4,87 @@
   border-radius: 8px;
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 
-  h3 {
-    margin-top: 0;
-    color: #333;
-  }
+.filters-container h3 {
+  margin-top: 0;
+  color: #333;
 }
 
 .filter-group {
-  display: inline-block; // o flex si prefieres más control
+  display: inline-block;
+  vertical-align: top;
   margin-right: 15px;
   margin-bottom: 10px;
+}
 
-  label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    font-size: 0.9em;
-    color: #555;
-  }
+.filter-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #555;
+}
 
-  input[type="text"],
-  input[type="date"] {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9em;
-  }
+.filter-group input[type="text"],
+.filter-group input[type="date"],
+.filter-group select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9em;
+  min-width: 170px;
+}
+
+.filter-loading-text,
+.filter-error-text {
+  font-size: 0.8em;
+  margin-top: 4px;
+  display: block;
+  min-height: 1.2em; /* Para evitar saltos de layout */
+}
+
+.filter-loading-text {
+  color: #555;
+  font-style: italic;
+}
+
+.filter-error-text {
+  color: #D8000C;
 }
 
 .filter-actions {
   margin-top: 10px;
+}
 
-  button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.2s ease;
-    margin-right: 10px;
+.filter-actions button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease;
+  margin-right: 10px;
+}
 
-    &:hover {
-      background-color: #0056b3;
-    }
+.filter-actions button:hover:not([disabled]) {
+  background-color: #0056b3;
+}
 
-    &.clear-button {
-      background-color: #6c757d;
-      &:hover {
-        background-color: #545b62;
-      }
-    }
-  }
+.filter-actions button.clear-button {
+  background-color: #6c757d;
+}
+
+.filter-actions button.clear-button:hover:not([disabled]) {
+  background-color: #545b62;
+}
+
+.filter-actions button:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
 }
 
 .loading-indicator {
@@ -82,17 +109,51 @@
   padding: 20px;
   font-style: italic;
   color: #777;
+  background-color: #fff;
+  border-radius: 4px;
+  margin: 15px 0;
 }
 
-.chart-wrapper {
-  display: block;
-  height: 400px; // Ajusta según necesites
-  width: 100%;
+.multi-chart-view {
   margin-bottom: 30px;
+}
+
+.multi-chart-view h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.location-chart-container {
   background-color: #fff;
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 25px;
+}
+
+.location-chart-container h4 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.single-chart-view {
+  margin-bottom: 30px;
+}
+
+.single-chart-view h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.chart-wrapper {
+  display: block;
+  height: 350px;
+  width: 100%;
 }
 
 .table-container {
@@ -101,33 +162,78 @@
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: left;
-      font-size: 0.9em;
-    }
-
-    th {
-      background-color: #f2f2f2;
-      font-weight: bold;
-      color: #333;
-    }
-
-    tbody tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-    tbody tr:hover {
-      background-color: #f1f1f1;
-    }
-  }
 }
 
-h2, h3 {
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-container th, 
+.table-container td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+  font-size: 0.9em;
+}
+
+.table-container th {
+  background-color: #f2f2f2;
+  font-weight: bold;
   color: #333;
+}
+
+.table-container tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+.table-container tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.pagination-controls button {
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 5px; /* Reducido margen para botones */
+  transition: background-color 0.2s ease;
+}
+
+.pagination-controls button:hover:not([disabled]) {
+  background-color: #0056b3;
+}
+
+.pagination-controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination-controls .page-info {
+  font-size: 0.9em;
+  color: #333;
+  margin: 0 10px;
+  display: inline-flex; /* Para alinear select y texto */
+  align-items: center;
+}
+
+.pagination-controls .page-select {
+  padding: 6px 8px; /* Ajustado el padding */
+  margin: 0 5px; /* Margen alrededor del select */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9em;
+  background-color: white;
+  cursor: pointer;
 }
