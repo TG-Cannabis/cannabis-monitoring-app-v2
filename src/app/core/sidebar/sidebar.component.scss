@@ -1,0 +1,29 @@
+.app-sidebar {
+  // El ancho y el fondo ya están definidos en layout.component.scss
+  // Aquí puedes estilizar los elementos internos de la barra lateral
+  nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  nav li a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  nav li a:hover {
+    background-color: #ddd;
+  }
+
+  nav li a.active-link {
+    background-color: #007bff; // Color para el enlace activo
+    color: white;
+    font-weight: bold;
+  }
+}

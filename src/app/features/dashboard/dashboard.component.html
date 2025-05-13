@@ -1,0 +1,69 @@
+<h2>Panel de Control de Sensores</h2>
+
+<div class="filters-container">
+  <h3>Filtros</h3>
+  <div class="filter-group">
+    <label for="sensorType">Tipo de Sensor:</label>
+    <input type="text" id="sensorType" [(ngModel)]="filterSensorType" placeholder="Ej: temperatura, humedad">
+  </div>
+  <div class="filter-group">
+    <label for="location">Ubicación:</label>
+    <input type="text" id="location" [(ngModel)]="filterLocation" placeholder="Ej: sala1, exterior">
+  </div>
+  <div class="filter-group">
+    <label for="startDate">Fecha Inicio:</label>
+    <input type="date" id="startDate" [(ngModel)]="filterStartDate">
+  </div>
+  <div class="filter-group">
+    <label for="endDate">Fecha Fin:</label>
+    <input type="date" id="endDate" [(ngModel)]="filterEndDate">
+  </div>
+  <div class="filter-actions">
+    <button (click)="applyFilters()">Aplicar Filtros</button>
+    <button (click)="clearFilters()" class="clear-button">Limpiar Filtros</button>
+  </div>
+</div>
+
+<div *ngIf="isLoading" class="loading-indicator">Cargando datos...</div>
+<div *ngIf="error" class="error-message">
+  Error al cargar datos: {{ error }}
+</div>
+
+<div *ngIf="!isLoading && !error">
+  <h3>Gráfico de Datos del Sensor</h3>
+  <div class="chart-wrapper" *ngIf="sensorData.length > 0">
+    <canvas baseChart
+            [data]="lineChartData"
+            [options]="lineChartOptions"
+            [type]="lineChartType">
+    </canvas>
+  </div>
+  <p *ngIf="sensorData.length === 0" class="no-data-message">No hay datos para mostrar en el gráfico con los filtros actuales.</p>
+
+  <h3>Tabla de Datos del Sensor</h3>
+  <div *ngIf="sensorData.length > 0" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Ubicación</th>
+          <th>Tipo de Sensor</th>
+          <th>ID Sensor</th>
+          <th>Valor</th>
+          <th>Timestamp</th>
+          <th>Guardado En</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of sensorData">
+          <td>{{ data.location }}</td>
+          <td>{{ data.sensorType }}</td>
+          <td>{{ data.sensorId }}</td>
+          <td>{{ data.value }}</td>
+          <td>{{ data.timestamp | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+          <td>{{ data.savedAt | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p *ngIf="sensorData.length === 0" class="no-data-message">No hay datos de sensores para mostrar en la tabla con los filtros actuales.</p>
+</div>

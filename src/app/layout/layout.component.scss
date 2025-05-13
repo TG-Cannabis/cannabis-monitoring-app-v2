@@ -1,0 +1,40 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+app-header {
+  position: fixed; // O sticky, según prefieras
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; // Para que esté por encima del contenido
+}
+
+.main-container {
+  display: flex;
+  flex-grow: 1;
+  padding-top: 60px; /* Ajusta esto a la altura de tu header */
+}
+
+app-sidebar {
+  width: 250px; /* Ancho fijo del sidebar */
+  min-height: 100%; // Para que ocupe toda la altura restante
+  position: fixed; // Fija el sidebar
+  top: 60px; // Debajo del header
+  left: 0;
+  bottom: 0;
+  background-color: #f4f4f4; // Color de fondo base
+  padding: 20px;
+  box-sizing: border-box;
+  z-index: 900; // Por debajo del header pero encima del contenido si hay superposición
+}
+
+.content-area {
+  flex-grow: 1;
+  padding: 20px;
+  margin-left: 250px; /* Mismo ancho que el sidebar para dejar espacio */
+  box-sizing: border-box;
+  // padding-top ya no es necesario aquí si el .main-container lo maneja
+}
