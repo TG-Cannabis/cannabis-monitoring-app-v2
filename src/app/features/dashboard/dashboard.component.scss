@@ -28,6 +28,7 @@
 
 .filter-group input[type="text"],
 .filter-group input[type="date"],
+.filter-group input[type="datetime-local"],
 .filter-group select {
   padding: 8px;
   border: 1px solid #ccc;
@@ -41,7 +42,7 @@
   font-size: 0.8em;
   margin-top: 4px;
   display: block;
-  min-height: 1.2em; /* Para evitar saltos de layout */
+  min-height: 1.2em; 
 }
 
 .filter-loading-text {
@@ -79,6 +80,14 @@
 
 .filter-actions button.clear-button:hover:not([disabled]) {
   background-color: #545b62;
+}
+
+.filter-actions button.report-button {
+  background-color: #28a745; 
+}
+
+.filter-actions button.report-button:hover:not([disabled]) {
+  background-color: #218838;
 }
 
 .filter-actions button:disabled {
@@ -207,7 +216,7 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin: 0 5px; /* Reducido margen para botones */
+  margin: 0 5px;
   transition: background-color 0.2s ease;
 }
 
@@ -224,16 +233,37 @@
   font-size: 0.9em;
   color: #333;
   margin: 0 10px;
-  display: inline-flex; /* Para alinear select y texto */
+  display: inline-flex;
   align-items: center;
 }
 
 .pagination-controls .page-select {
-  padding: 6px 8px; /* Ajustado el padding */
-  margin: 0 5px; /* Margen alrededor del select */
+  padding: 6px 8px;
+  margin: 0 5px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 0.9em;
   background-color: white;
   cursor: pointer;
+}
+
+.table-toggle-container {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.table-toggle-button {
+  padding: 10px 15px;
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease;
+}
+
+.table-toggle-button:hover {
+  background-color: #138496;
 }

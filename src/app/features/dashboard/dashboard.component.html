@@ -3,36 +3,40 @@
 <div class="filters-container">
   <h3>Filtros</h3>
   <div class="filter-group">
-    <label for="sensorTypeSelect">Tipo de Sensor:</label>
-    <select id="sensorTypeSelect" [(ngModel)]="filterSensorType" [disabled]="isLoadingTags">
-      <option value="">Todos</option>
-      <option *ngFor="let type of availableSensorTypes" [value]="type">{{ type }}</option>
+    <label for="variableEntornoSelect">Variable de Entorno:</label>
+    <select id="variableEntornoSelect" [(ngModel)]="filterVariableEntorno" [disabled]="isLoadingTags">
+      <option value="">Todas</option>
+      <option *ngFor="let type of availableVariablesEntorno" [value]="type">{{ type }}</option>
     </select>
-    <div *ngIf="isLoadingTags && availableSensorTypes.length === 0" class="filter-loading-text">Cargando tipos...</div>
-    <div *ngIf="tagsError && availableSensorTypes.length === 0 && !isLoadingTags" class="filter-error-text">{{ tagsError }}</div>
+    <div *ngIf="isLoadingTags && availableVariablesEntorno.length === 0" class="filter-loading-text">Cargando variables...</div>
+    <div *ngIf="tagsError && availableVariablesEntorno.length === 0 && !isLoadingTags" class="filter-error-text">{{ tagsError }}</div>
   </div>
 
   <div class="filter-group">
-    <label for="locationSelect">Ubicación:</label>
-    <select id="locationSelect" [(ngModel)]="filterLocation" [disabled]="isLoadingTags">
-      <option value="">Todas</option>
-      <option *ngFor="let loc of availableLocations" [value]="loc">{{ loc }}</option>
+    <label for="invernaderoSelect">Invernadero:</label>
+    <select id="invernaderoSelect" [(ngModel)]="filterInvernadero" [disabled]="isLoadingTags">
+      <option value="">Todos</option>
+      <option *ngFor="let loc of availableInvernaderos" [value]="loc">{{ loc }}</option>
     </select>
-    <div *ngIf="isLoadingTags && availableLocations.length === 0" class="filter-loading-text">Cargando ubicaciones...</div>
-    <div *ngIf="tagsError && availableLocations.length === 0 && !isLoadingTags" class="filter-error-text">{{ tagsError }}</div>
+    <div *ngIf="isLoadingTags && availableInvernaderos.length === 0" class="filter-loading-text">Cargando invernaderos...</div>
+    <div *ngIf="tagsError && availableInvernaderos.length === 0 && !isLoadingTags" class="filter-error-text">{{ tagsError }}</div>
   </div>
 
   <div class="filter-group">
     <label for="startDate">Fecha Inicio:</label>
-    <input type="date" id="startDate" [(ngModel)]="filterStartDate">
+    <input type="datetime-local" id="startDate" [(ngModel)]="filterStartDate">
   </div>
   <div class="filter-group">
     <label for="endDate">Fecha Fin:</label>
-    <input type="date" id="endDate" [(ngModel)]="filterEndDate">
+    <input type="datetime-local" id="endDate" [(ngModel)]="filterEndDate">
   </div>
   <div class="filter-actions">
     <button (click)="applyFilters()" [disabled]="isLoading || isLoadingTags">Aplicar Filtros</button>
     <button (click)="clearFilters()" class="clear-button" [disabled]="isLoading || isLoadingTags">Limpiar Filtros</button>
+    <button (click)="generatePdfReport()" class="report-button" 
+            [disabled]="isLoading || isLoadingTags || (sensorData.length === 0 && locationCharts.length === 0 && (!singleLineChartData.datasets[0].data || singleLineChartData.datasets[0].data.length === 0))">
+      Generar Reporte PDF
+    </button>
   </div>
 </div>
 
@@ -43,12 +47,12 @@
 
 <div *ngIf="!isLoading && !error">
   <div *ngIf="isMultiChartView" class="multi-chart-view">
-    <h3 *ngIf="locationCharts.length > 0 || allLocationKeysForPaging.length > 0">Visualización por Ubicación y Tipo de Sensor</h3>
+    <h3 *ngIf="locationCharts.length > 0 || allLocationKeysForPaging.length > 0">Visualización por Invernadero y Variable de Entorno</h3>
     
     <div *ngFor="let locChart of locationCharts" class="location-chart-container">
-      <h4>Ubicación: {{ locChart.locationName }}</h4>
+      <h4>Invernadero: {{ locChart.locationName }}</h4>
       <div class="chart-wrapper">
-        <canvas baseChart
+        <canvas #multiChartCanvas baseChart
                 [data]="locChart.chartDataConfig"
                 [options]="locChart.chartOptionsConfig"
                 [type]="lineChartType">
@@ -67,37 +71,64 @@
       </span>
       <button (click)="nextPage()" [disabled]="currentPage === totalPages">Siguiente</button>
     </div>
-     <p *ngIf="allLocationKeysForPaging.length === 0 && sensorData.length > 0" class="no-data-message">
-      No hay datos de ubicación para mostrar en vista múltiple con los filtros de fecha actuales.
+     <p *ngIf="allLocationKeysForPaging.length === 0 && sensorData.length > 0 && isMultiChartView && locationCharts.length === 0" class="no-data-message">
+      No hay datos de invernadero para mostrar en vista múltiple con los filtros de fecha actuales.
     </p>
   </div>
 
-  <div *ngIf="!isMultiChartView && singleLineChartData.datasets && singleLineChartData.datasets.length > 0 && singleLineChartData.datasets[0] && singleLineChartData.datasets[0].data && singleLineChartData.datasets[0].data.length > 0" class="single-chart-view">
-    <h3>Gráfico de Datos Filtrados</h3>
-    <div class="chart-wrapper">
-      <canvas baseChart
-              [data]="singleLineChartData"
-              [options]="commonLineChartOptions"
-              [type]="lineChartType">
-      </canvas>
-    </div>
-  </div>
+  <ng-container *ngIf="!isMultiChartView && singleLineChartData.datasets && singleLineChartData.datasets.length > 0">
+    <ng-container *ngIf="singleLineChartData.datasets[0].data as firstDatasetData">
+      <div *ngIf="firstDatasetData.length > 0" class="single-chart-view">
+        <h3 *ngIf="isSingleVariableAllInvernaderosView">Variable: {{ filterVariableEntorno }} (entre Invernaderos)</h3>
+        <h3 *ngIf="!isSingleVariableAllInvernaderosView && !isMultiChartView">Gráfico de Datos Filtrados</h3>
+        <div class="chart-wrapper">
+          <canvas #singleChartCanvas baseChart
+                  [data]="singleLineChartData"
+                  [options]="commonLineChartOptions"
+                  [type]="lineChartType">
+          </canvas>
+        </div>
+        <div class="pagination-controls" *ngIf="isSingleVariableAllInvernaderosView && invernaderoLinesTotalPages > 1">
+          <button (click)="previousInvernaderoLinesPage()" [disabled]="invernaderoLinesCurrentPage === 1">Anterior (Invernaderos)</button>
+          <span class="page-info">
+            Invernaderos (pág. 
+            <select class="page-select" [ngModel]="invernaderoLinesCurrentPage" (ngModelChange)="goToInvernaderoLinesPage($event)" title="Ir a página de invernaderos">
+              <option *ngFor="let page of getInvernaderoLinesPages()" [value]="page">{{ page }}</option>
+            </select>
+            de {{ invernaderoLinesTotalPages }})
+          </span>
+          <button (click)="nextInvernaderoLinesPage()" [disabled]="invernaderoLinesCurrentPage === invernaderoLinesTotalPages">Siguiente (Invernaderos)</button>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+  
+  <p *ngIf="!isMultiChartView && (!singleLineChartData.datasets || singleLineChartData.datasets.length === 0 || (singleLineChartData.datasets[0] && (!singleLineChartData.datasets[0].data || singleLineChartData.datasets[0].data.length === 0))) && sensorData.length > 0 && !isLoading && !isSingleVariableAllInvernaderosView && locationCharts.length === 0" class="no-data-message">
+    No hay datos para graficar con los filtros específicos seleccionados.
+  </p>
+   <p *ngIf="isSingleVariableAllInvernaderosView && (!singleLineChartData.datasets || singleLineChartData.datasets.length === 0 || (singleLineChartData.datasets[0] && (!singleLineChartData.datasets[0].data || singleLineChartData.datasets[0].data.length === 0))) && sensorData.length > 0 && !isLoading && locationCharts.length === 0" class="no-data-message">
+    No hay datos para la variable {{filterVariableEntorno}} en los invernaderos de esta página.
+  </p>
 
   <p *ngIf="sensorData.length === 0 && !isLoading" class="no-data-message">
     No hay datos para mostrar con los filtros actuales.
   </p>
   
-  <h3 *ngIf="sensorData.length > 0">Tabla de Datos del Sensor ({{ sensorData.length }} registros)</h3>
-  <div *ngIf="sensorData.length > 0" class="table-container">
+  <div class="table-toggle-container">
+    <button (click)="toggleTableVisibility()" class="table-toggle-button">
+      {{ isTableVisible ? 'Ocultar Tabla de Datos' : 'Mostrar Tabla de Datos' }} ({{ sensorData.length }} registros)
+    </button>
+  </div>
+
+  <div *ngIf="isTableVisible && sensorData.length > 0" class="table-container">
     <table>
       <thead>
         <tr>
-          <th>Ubicación</th>
-          <th>Tipo de Sensor</th>
+          <th>Invernadero</th>
+          <th>Variable de Entorno</th>
           <th>ID Sensor</th>
           <th>Valor</th>
-          <th>Timestamp</th>
-          <th>Guardado En</th>
+          <th>Timestamp (UTC)</th>
         </tr>
       </thead>
       <tbody>
@@ -106,8 +137,7 @@
           <td>{{ data.sensorType }}</td>
           <td>{{ data.sensorId }}</td>
           <td>{{ data.value }}</td>
-          <td>{{ data.timestamp | date:'yyyy-MM-dd HH:mm:ss' }}</td>
-          <td>{{ data.savedAt | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+          <td>{{ data.timestamp | date:'yyyy-MM-ddTHH:mm:ss':'UTC' }}Z</td>
         </tr>
       </tbody>
     </table>

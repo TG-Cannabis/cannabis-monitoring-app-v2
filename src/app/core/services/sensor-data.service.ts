@@ -20,24 +20,38 @@ export class SensorDataService {
   getSensorData(filters: ApiFilters = {}): Observable<SensorData[]> {
     const sensorDataUrl = `${this.apiUrlBase}/sensorData`;
     let params = new HttpParams();
+
     if (filters.sensorType) {
       params = params.set('sensorType', filters.sensorType);
     }
     if (filters.location) {
       params = params.set('location', filters.location);
     }
+
     if (filters.startDate) {
-      params = params.set('startDate', filters.startDate);
+      try {
+        const startDateIso = new Date(filters.startDate).toISOString();
+        const formattedStartDate = startDateIso.substring(0, 19) + 'Z';
+        params = params.set('startDate', formattedStartDate);
+      } catch (e) {
+        console.error('Formato de fecha de inicio inválido:', filters.startDate, e);
+      }
     }
     if (filters.endDate) {
-      params = params.set('endDate', filters.endDate);
+      try {
+        const endDateIso = new Date(filters.endDate).toISOString();
+        const formattedEndDate = endDateIso.substring(0, 19) + 'Z';
+        params = params.set('endDate', formattedEndDate);
+      } catch (e) {
+        console.error('Formato de fecha de fin inválido:', filters.endDate, e);
+      }
     }
 
     return this.http.get<SensorData[]>(sensorDataUrl, { params }).pipe(
       map(data => {
         return data.map(point => ({
           ...point,
-          timestamp: point.timestamp
+          timestamp: point.timestamp 
         }));
       }),
       catchError(this.handleError)
@@ -68,4 +82,4 @@ export class SensorDataService {
   }
 }
 
-export type{ ApiFilters };
+export type { ApiFilters };
