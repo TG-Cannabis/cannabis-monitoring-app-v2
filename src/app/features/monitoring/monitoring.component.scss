@@ -1,0 +1,208 @@
+/* src/app/features/monitoring/monitoring.component.scss */
+
+.filters-container {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  h3 {
+    margin-top: 0;
+    color: #333;
+  }
+}
+
+.filter-group {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 20px;
+  margin-bottom: 15px;
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 0.9em;
+    color: #555;
+  }
+
+  input[type="text"],
+  input[type="datetime-local"],
+  select {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
+    min-width: 180px;
+    box-sizing: border-box;
+  }
+}
+
+.filter-loading-text,
+.filter-error-text { 
+  font-size: 0.8em;
+  margin-top: 4px;
+  display: block;
+  min-height: 1.2em;
+}
+
+.filter-loading-text {
+  color: #555;
+  font-style: italic;
+}
+
+.filter-error-text {
+  color: #D8000C;
+}
+
+.filter-actions {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+
+  button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+    margin-right: 10px;
+
+    &:hover:not([disabled]) {
+      background-color: #0056b3;
+    }
+
+    &.clear-button {
+      background-color: #6c757d;
+
+      &:hover:not([disabled]) {
+        background-color: #545b62;
+      }
+    }
+
+    &:disabled {
+      background-color: #e9ecef;
+      color: #6c757d;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.connection-status {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+
+  .status-connected { color: green; font-weight: bold; }
+  .status-attempting { color: orange; font-weight: bold; }
+  .status-disconnected { color: gray; font-weight: bold; }
+  .status-error { color: red; font-weight: bold; }
+
+  .reconnect-button {
+    margin-left: 15px;
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+}
+
+.chart-container {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+
+  h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    text-align: center;
+  }
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 400px;
+  width: 100%;
+}
+
+.no-data-message {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #777;
+}
+
+.monitors-container {
+  display: flex;
+  flex-wrap: wrap; 
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.monitor-section {
+  flex: 1 1 400px; 
+  min-width: 300px; 
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 5px;
+  background-color: #fff;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+
+
+  h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  li {
+    padding: 8px 0;
+    border-bottom: 1px dotted #eee;
+    font-size: 0.9em;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .alert-message {
+    strong { display: block; margin-bottom: 4px;}
+    small { color: #555; }
+  }
+  .alert-critical, .alert-error {
+    border-left: 4px solid red;
+    padding-left: 8px;
+    background-color: #ffebee; 
+  }
+  .alert-warning {
+    border-left: 4px solid orange;
+    padding-left: 8px;
+    background-color: #fff3e0;
+  }
+  .alert-info {
+    border-left: 4px solid #3e95cd;
+    padding-left: 8px;
+    background-color: #e3f2fd;
+  }
+}

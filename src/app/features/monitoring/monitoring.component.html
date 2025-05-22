@@ -1,0 +1,83 @@
+<h2>Monitoreo en Tiempo Real</h2>
+
+<div class="filters-container">
+  <h3>Filtros de Visualización en Tiempo Real</h3>
+  <div class="filter-group">
+    <label for="variableEntornoSelectMon">Variable de Entorno:</label>
+    <select id="variableEntornoSelectMon" [(ngModel)]="filterVariableEntorno" [disabled]="isLoadingTags">
+      <option value="">Todas</option>
+      <option *ngFor="let type of availableVariablesEntorno" [value]="type">{{ type }}</option>
+    </select>
+    <div *ngIf="isLoadingTags && availableVariablesEntorno.length === 0" class="filter-loading-text">Cargando variables...</div>
+    <div *ngIf="tagsError && availableVariablesEntorno.length === 0 && !isLoadingTags" class="filter-error-text">{{ tagsError }}</div>
+  </div>
+
+  <div class="filter-group">
+    <label for="startDateMon">Fecha Inicio (Ventana):</label>
+    <input type="datetime-local" id="startDateMon" [(ngModel)]="filterStartDate">
+  </div>
+  <div class="filter-group">
+    <label for="endDateMon">Fecha Fin (Ventana):</label>
+    <input type="datetime-local" id="endDateMon" [(ngModel)]="filterEndDate">
+  </div>
+
+  <div class="filter-actions">
+    <button (click)="applyFilters()" [disabled]="isLoadingTags">Aplicar Filtros</button>
+    <button (click)="clearFilters()" class="clear-button" [disabled]="isLoadingTags">Limpiar Filtros</button>
+  </div>
+</div>
+
+<div class="connection-status">
+  <strong>Estado de Conexión:</strong>
+  <span [ngSwitch]="connectionState">
+    <span *ngSwitchCase="ConnectionStateEnum.CONNECTED" class="status-connected">Conectado</span>
+    <span *ngSwitchCase="ConnectionStateEnum.ATTEMPTING" class="status-attempting">Intentando Conectar...</span>
+    <span *ngSwitchCase="ConnectionStateEnum.DISCONNECTED" class="status-disconnected">Desconectado</span>
+    <span *ngSwitchCase="ConnectionStateEnum.ERROR" class="status-error">Error de Conexión</span>
+    <span *ngSwitchDefault class="status-disconnected">Desconocido</span>
+  </span>
+  <button *ngIf="connectionState === ConnectionStateEnum.DISCONNECTED || connectionState === ConnectionStateEnum.ERROR"
+          (click)="attemptReconnect()" class="reconnect-button">
+    Reconectar
+  </button>
+</div>
+
+<div class="chart-container">
+  <h3>Gráfico de Sensores en Tiempo Real</h3>
+  <div class="chart-wrapper">
+    <canvas baseChart
+            [data]="sensorLineChartData"
+            [options]="sensorLineChartOptions"
+            [type]="sensorLineChartType">
+    </canvas>
+  </div>
+  <p *ngIf="!sensorLineChartData || sensorLineChartData.datasets.length === 0" class="no-data-message">
+    Esperando datos para graficar que coincidan con los filtros...
+  </p>
+</div>
+
+
+<div class="monitors-container">
+  <div class="monitor-section">
+    <h3>Últimos Datos de Sensores Filtrados (Texto)</h3>
+    <ul *ngIf="textSensorMessages.length > 0; else noSensorData">
+      <li *ngFor="let msg of textSensorMessages" class="sensor-message">
+        <strong>{{ msg.sensorType || 'N/A' }}</strong> en <i>{{ msg.location || 'N/A' }} (ID: {{ msg.sensorId || 'N/A' }})</i>:
+        Valor = {{ msg.value }}, Timestamp: {{ msg.timestamp | date:'mediumTime' }}
+      </li>
+    </ul>
+    <ng-template #noSensorData><p>Esperando datos de sensores que coincidan con los filtros...</p></ng-template>
+  </div>
+
+  <div class="monitor-section">
+    <h3>Últimas Alertas (Texto)</h3>
+    <ul *ngIf="alertMessages.length > 0; else noAlerts">
+      <li *ngFor="let alert of alertMessages" class="alert-message alert-{{alert.level.toLowerCase()}}">
+        <strong>Alerta {{ alert.level || 'INFO' }}:</strong> {{ alert.message }}
+        <br>
+        <small>Fuente: {{ alert.source || 'N/A' }}, Timestamp: {{ alert.timestamp | date:'mediumTime' }}</small>
+      </li>
+    </ul>
+    <ng-template #noAlerts><p>Esperando alertas...</p></ng-template>
+  </div>
+</div>

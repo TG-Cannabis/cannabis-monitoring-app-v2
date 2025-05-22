@@ -14,11 +14,11 @@ export const routes: Routes = [
         // Crea un DashboardComponent o el que sea tu vista principal
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
-      /*{
+      {
         path: 'monitoring',
         // Ejemplo de otra sección, como el gráfico de sensores que creaste
-        loadComponent: () => import('./features/monitoring/components/sensor-chart/sensor-chart.component').then(m => m.SensorChartComponent)
-      },
+        loadComponent: () => import('./features/monitoring/monitoring.component').then(m => m.MonitoringComponent)
+      },/*
       {
         path: 'settings',
         // Crea un SettingsComponent
