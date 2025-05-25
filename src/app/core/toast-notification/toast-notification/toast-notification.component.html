@@ -1,0 +1,14 @@
+<div class="toast-container">
+  <div *ngFor="let toast of toasts"
+       [@toastAnimation]
+       class="toast-message toast-{{toast.level.toLowerCase()}}"
+       (click)="removeToast(toast.id)">
+    <div class="toast-header">
+      <strong>{{ toast.level }}</strong>
+      <button class="close-toast-btn" (click)="removeToast(toast.id); $event.stopPropagation();">&times;</button>
+    </div>
+    <div class="toast-body">
+      {{ toast.message }}
+    </div>
+  </div>
+</div>

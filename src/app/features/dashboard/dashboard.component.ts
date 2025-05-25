@@ -1,11 +1,11 @@
-// src/app/features/dashboard/dashboard.component.ts
+
 
 import { Component, OnInit, inject, ViewChild, ViewChildren, QueryList, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SensorDataService, ApiFilters, AvailableTags } from '../../core/services/sensor-data.service';
 import { SensorData } from '../../core/models/sensor-data.model';
-// Asegúrate de que ReportData se importe desde el servicio correcto y esté actualizada
+
 import { PdfReportService, ReportData } from '../../core/services/pdf-report.service';
 
 import { BaseChartDirective } from 'ng2-charts';
@@ -18,13 +18,13 @@ interface LocationChart {
   chartOptionsConfig: ChartOptions<'line'>;
 }
 
-// Función auxiliar para capturar imagen de un gráfico con reintentos
+
 async function captureChartImage(
   chartDirective: BaseChartDirective | undefined,
   chartNameForLog: string,
-  cdr: ChangeDetectorRef, // Pasar ChangeDetectorRef
+  cdr: ChangeDetectorRef, 
   maxRetries = 5,
-  delayBetweenRetries = 300 // ms
+  delayBetweenRetries = 300 
 ): Promise<string | null> {
   if (!chartDirective) {
     console.warn(`[Dashboard] Directiva de gráfico para '${chartNameForLog}' es indefinida.`);
@@ -32,15 +32,15 @@ async function captureChartImage(
   }
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    // Forzar detección de cambios y esperar un poco a que el DOM se estabilice
+    
     cdr.detectChanges();
-    await new Promise(resolve => setTimeout(resolve, 100)); // Pequeña pausa para el DOM
+    await new Promise(resolve => setTimeout(resolve, 100)); 
 
     if (chartDirective.chart && chartDirective.chart.ctx) {
       try {
-        // Actualizar el gráfico sin animación para asegurar que el estado es el más reciente
+        
         chartDirective.chart.update('none');
-        // Esperar al siguiente frame de animación + una pequeña pausa para el renderizado
+        
         await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 50)));
 
         const image = chartDirective.chart.toBase64Image();
@@ -117,12 +117,12 @@ export class DashboardComponent implements OnInit {
 
   allInvernaderoKeysForSelectedVariable: string[] = [];
   invernaderoLinesCurrentPage = 1;
-  invernaderoLinesItemsPerPage = 5; // Cuántas líneas de invernadero por gráfico "todos los invernaderos"
+  invernaderoLinesItemsPerPage = 5; 
   invernaderoLinesTotalPages = 0;
 
-  // Mapas para mantener consistencia de colores
+  
   private variableColorMap: { [key: string]: string } = {};
-  private locationColorMap: { [key: string]: string } = {}; // Para cuando se agrupa por invernadero
+  private locationColorMap: { [key: string]: string } = {}; 
   private colorIndexForVariables = 0;
   private colorIndexForLocations = 0;
 
@@ -134,9 +134,9 @@ export class DashboardComponent implements OnInit {
       x: {
         type: 'time',
         time: {
-          unit: 'minute', // Ajusta según la granularidad de tus datos
-          tooltipFormat: 'MMM d, HH:mm', // Formato para el tooltip
-          displayFormats: { // Formatos para mostrar en el eje
+          unit: 'minute', 
+          tooltipFormat: 'MMM d, HH:mm', 
+          displayFormats: { 
             minute: 'HH:mm', 
             hour: 'MMM d, HH:mm' 
           }
@@ -144,7 +144,7 @@ export class DashboardComponent implements OnInit {
         title: { display: true, text: 'Tiempo' }
       },
       y: {
-        beginAtZero: false, // Ajusta si quieres que el eje Y siempre empiece en 0
+        beginAtZero: false, 
         title: { display: true, text: 'Valor' }
       }
     },
@@ -153,12 +153,12 @@ export class DashboardComponent implements OnInit {
       tooltip: { mode: 'index', intersect: false }
     },
     interaction: { mode: 'nearest', axis: 'x', intersect: false },
-    animation: { duration: 0 } // Desactivar animaciones puede ayudar con la captura para PDF
+    animation: { duration: 0 } 
   };
 
   public lineChartType: 'line' = 'line';
 
-  // Paleta de colores base para los gráficos
+  
   private baseChartColors: string[] = [
     '#3e95cd', '#8e5ea2', '#3cba9f', '#e8c3b9', '#c45850',
     '#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4bc0c0',
@@ -168,10 +168,10 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFilterOptions();
-    this.loadData(); // Carga inicial de datos
+    this.loadData(); 
   }
 
-  // Asigna un color consistente a una variable o ubicación
+  
   private assignColor(itemKey: string, map: { [key: string]: string }, colorIndexTracker: 'variables' | 'locations'): string {
     if (!map[itemKey]) {
       const indexToUse = colorIndexTracker === 'variables' ? this.colorIndexForVariables++ : this.colorIndexForLocations++;
@@ -189,10 +189,10 @@ export class DashboardComponent implements OnInit {
         next: (tags: AvailableTags) => {
           this.availableVariablesEntorno = tags.sensorTypes || [];
           this.availableInvernaderos = tags.locations || [];
-          // Pre-asignar colores para consistencia
-          this.colorIndexForVariables = 0; // Resetear índice para variables
+          
+          this.colorIndexForVariables = 0; 
           this.availableVariablesEntorno.forEach(variable => this.assignColor(variable, this.variableColorMap, 'variables'));
-          this.colorIndexForLocations = 0; // Resetear índice para ubicaciones
+          this.colorIndexForLocations = 0; 
           this.availableInvernaderos.forEach(loc => this.assignColor(loc, this.locationColorMap, 'locations'));
         },
         error: (err) => {
@@ -210,14 +210,14 @@ export class DashboardComponent implements OnInit {
     const filters: ApiFilters = {
       sensorType: this.filterVariableEntorno || undefined,
       location: this.filterInvernadero || undefined,
-      startDate: this.filterStartDate || undefined, // El backend espera formato ISO si se envía
-      endDate: this.filterEndDate || undefined     // El backend espera formato ISO si se envía
+      startDate: this.filterStartDate || undefined, 
+      endDate: this.filterEndDate || undefined     
     };
 
     this.sensorService.getSensorData(filters)
       .pipe(finalize(() => {
         this.isLoading = false;
-        this.cdr.detectChanges(); // Importante para actualizar la vista después de cargar datos
+        this.cdr.detectChanges(); 
       }))
       .subscribe({
         next: (data) => {
@@ -228,14 +228,14 @@ export class DashboardComponent implements OnInit {
           this.error = err.message;
           console.error('Error al cargar datos de sensores:', err);
           this.sensorData = [];
-          this.processDataForView(filters); // Procesar incluso si hay error para limpiar gráficos
+          this.processDataForView(filters); 
         }
       });
   }
 
   applyFilters(): void {
-    this.currentPage = 1; // Resetear paginación de gráficos múltiples
-    this.invernaderoLinesCurrentPage = 1; // Resetear paginación de líneas de invernadero
+    this.currentPage = 1; 
+    this.invernaderoLinesCurrentPage = 1; 
     this.loadData();
   }
 
@@ -255,7 +255,7 @@ export class DashboardComponent implements OnInit {
 
   private groupDataBy(data: SensorData[], key: keyof SensorData): { [key: string]: SensorData[] } {
     return data.reduce((acc, item) => {
-      const groupKey = String(item[key]); // Asegurar que la clave sea un string
+      const groupKey = String(item[key]); 
       (acc[groupKey] = acc[groupKey] || []).push(item);
       return acc;
     }, {} as { [key: string]: SensorData[] });
@@ -265,13 +265,13 @@ export class DashboardComponent implements OnInit {
     const isSpecificVariableFilter = !!filters.sensorType;
     const isSpecificInvernaderoFilter = !!filters.location;
 
-    // Resetear estados de vista
+    
     this.isMultiChartView = false;
     this.isSingleVariableAllInvernaderosView = false;
-    this.singleLineChartData = { datasets: [{ data: [], label: 'No hay datos'}] }; // Estado inicial
+    this.singleLineChartData = { datasets: [{ data: [], label: 'No hay datos'}] }; 
     this.locationCharts = [];
     
-    // Resetear paginación
+    
     this.totalPages = 0;
     this.invernaderoLinesTotalPages = 0;
 
@@ -281,23 +281,23 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    // Caso 1: Sin filtros específicos (o solo fechas) -> Gráficos múltiples por invernadero
+    
     if (!isSpecificVariableFilter && !isSpecificInvernaderoFilter) {
       this.isMultiChartView = true;
       const dataByLocation = this.groupDataBy(this.sensorData, 'location');
-      this.allLocationKeysForPaging = Object.keys(dataByLocation).sort(); // Ordenar para consistencia
+      this.allLocationKeysForPaging = Object.keys(dataByLocation).sort(); 
       this.totalPages = Math.ceil(this.allLocationKeysForPaging.length / this.itemsPerPage);
       
       if (this.currentPage > this.totalPages && this.totalPages > 0) this.currentPage = this.totalPages;
-      else if (this.totalPages === 0 && this.allLocationKeysForPaging.length > 0) this.currentPage = 1; // Si solo hay una página
+      else if (this.totalPages === 0 && this.allLocationKeysForPaging.length > 0) this.currentPage = 1; 
       else if (this.allLocationKeysForPaging.length === 0) { this.currentPage = 1; this.totalPages = 0;}
       
       this.displayChartsForCurrentPage();
     }
-    // Caso 2: Filtro de variable específico, sin filtro de invernadero -> Un gráfico con líneas por invernadero
+    
     else if (isSpecificVariableFilter && !isSpecificInvernaderoFilter) {
       this.isSingleVariableAllInvernaderosView = true;
-      // Filtrar datos solo para la variable seleccionada
+      
       const filteredDataForVariable = this.sensorData.filter(d => d.sensorType === filters.sensorType);
       const dataByInvernadero = this.groupDataBy(filteredDataForVariable, 'location');
       this.allInvernaderoKeysForSelectedVariable = Object.keys(dataByInvernadero).sort();
@@ -309,9 +309,9 @@ export class DashboardComponent implements OnInit {
 
       this.displayLinesForCurrentPageOfInvernaderos();
     }
-    // Caso 3: Sin filtro de variable, con filtro de invernadero específico -> Un gráfico con líneas por variable
+    
     else if (!isSpecificVariableFilter && isSpecificInvernaderoFilter) {
-      // Filtrar datos solo para la ubicación seleccionada
+      
       const filteredDataForLocation = this.sensorData.filter(d => d.location === filters.location);
       const dataByVariable = this.groupDataBy(filteredDataForLocation, 'sensorType');
       const datasets: ChartDataset<'line', { x: number; y: number }[]>[] = [];
@@ -323,7 +323,7 @@ export class DashboardComponent implements OnInit {
             data: varData.map(p => ({ x: p.timestamp, y: p.value })),
             label: variableKey,
             borderColor: this.assignColor(variableKey, this.variableColorMap, 'variables'),
-            backgroundColor: this.assignColor(variableKey, this.variableColorMap, 'variables') + '33', // Color con opacidad
+            backgroundColor: this.assignColor(variableKey, this.variableColorMap, 'variables') + '33', 
             fill: false,
             tension: 0.1,
             pointRadius: 2,
@@ -333,9 +333,9 @@ export class DashboardComponent implements OnInit {
       });
       this.singleLineChartData = datasets.length > 0 ? { datasets } : { datasets: [{ data: [], label: `No hay datos para ${filters.location}`}] };
     }
-    // Caso 4: Filtro de variable y filtro de invernadero específicos -> Un gráfico con una sola línea
+    
     else if (isSpecificVariableFilter && isSpecificInvernaderoFilter) {
-      // Los datos ya deberían estar filtrados por el backend, pero por si acaso:
+      
       const specificData = this.sensorData.filter(d => d.sensorType === filters.sensorType && d.location === filters.location)
                                       .sort((a,b) => a.timestamp - b.timestamp);
       const dataPoints = specificData.map(p => ({ x: p.timestamp, y: p.value }));
@@ -386,7 +386,7 @@ export class DashboardComponent implements OnInit {
       return {
         locationName: locationKey,
         chartDataConfig: datasetsForLoc.length > 0 ? { datasets: datasetsForLoc } : { datasets: [{data:[], label:'No hay datos'}] },
-        chartOptionsConfig: { ...this.commonLineChartOptions } // Clonar para evitar modificaciones compartidas
+        chartOptionsConfig: { ...this.commonLineChartOptions } 
       };
     });
     this.cdr.detectChanges();
@@ -404,14 +404,14 @@ export class DashboardComponent implements OnInit {
     const datasets: ChartDataset<'line', { x: number; y: number }[]>[] = [];
     
     invernaderosForPage.forEach(invernaderoKey => {
-      // Asumimos que this.sensorData ya está filtrado por this.filterVariableEntorno si es relevante,
-      // o que aquí filtramos explícitamente.
+      
+      
       const invernaderoData = this.sensorData.filter(d => d.location === invernaderoKey && d.sensorType === this.filterVariableEntorno)
                                          .sort((a,b) => a.timestamp - b.timestamp);
       if (invernaderoData.length > 0) {
         datasets.push({
           data: invernaderoData.map(p => ({ x: p.timestamp, y: p.value })),
-          label: `${invernaderoKey} (${this.filterVariableEntorno})`, // Etiqueta más descriptiva
+          label: `${invernaderoKey} (${this.filterVariableEntorno})`, 
           borderColor: this.assignColor(invernaderoKey, this.locationColorMap, 'locations'),
           backgroundColor: this.assignColor(invernaderoKey, this.locationColorMap, 'locations') + '33',
           fill: false, tension: 0.1, pointRadius: 2, pointHoverRadius: 5
@@ -429,7 +429,7 @@ export class DashboardComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // Métodos de Paginación (MultiChart View)
+  
   nextPage(): void { if (this.currentPage < this.totalPages) { this.currentPage++; this.displayChartsForCurrentPage(); } }
   previousPage(): void { if (this.currentPage > 1) { this.currentPage--; this.displayChartsForCurrentPage(); } }
   goToPage(pageInput: Event | number): void {
@@ -442,7 +442,7 @@ export class DashboardComponent implements OnInit {
     return pagesArray;
   }
 
-  // Métodos de Paginación (Single Variable All Invernaderos View)
+  
   nextInvernaderoLinesPage(): void { if (this.invernaderoLinesCurrentPage < this.invernaderoLinesTotalPages) { this.invernaderoLinesCurrentPage++; this.displayLinesForCurrentPageOfInvernaderos(); } }
   previousInvernaderoLinesPage(): void { if (this.invernaderoLinesCurrentPage > 1) { this.invernaderoLinesCurrentPage--; this.displayLinesForCurrentPageOfInvernaderos(); } }
   goToInvernaderoLinesPage(pageInput: Event | number): void {
@@ -457,11 +457,11 @@ export class DashboardComponent implements OnInit {
 
   async generatePdfReport(): Promise<void> {
     console.log('[Dashboard] Iniciando preparación de datos para el reporte PDF...');
-    this.isLoading = true; // Mostrar indicador de carga
+    this.isLoading = true; 
 
-    // Forzar una detección de cambios para asegurar que el DOM está lo más actualizado posible
+    
     this.cdr.detectChanges();
-    await new Promise(resolve => setTimeout(resolve, 200)); // Pausa para el DOM y renderizado inicial
+    await new Promise(resolve => setTimeout(resolve, 200)); 
 
     const capturedMultiChartImages: { locationName: string, imageData: string | null }[] = [];
     let capturedSingleChartImage: { chartLabel: string, imageData: string | null } | undefined = undefined;
@@ -470,18 +470,18 @@ export class DashboardComponent implements OnInit {
       const directivesArray = this.multiChartCanvases.toArray();
       console.log(`[Dashboard] Procesando ${directivesArray.length} directivas para gráficos múltiples.`);
       
-      // Importante: Asegurarse que locationCharts y directivesArray estén sincronizados
-      // Si locationCharts se basa en una paginación de datos, las directivas también deben corresponder
-      // a los gráficos actualmente visibles/renderizados.
+      
+      
+      
       for (let i = 0; i < this.locationCharts.length; i++) {
-        // Asumimos que this.locationCharts tiene los metadatos de los gráficos visibles
-        // y que directivesArray[i] es la directiva correspondiente al gráfico this.locationCharts[i]
+        
+        
         const locChartMeta = this.locationCharts[i];
         const directive = directivesArray.find((d, index) => {
-          // Esta lógica de emparejamiento podría necesitar ser más robusta si el orden no está garantizado
-          // o si los gráficos no se renderizan todos a la vez.
-          // Por ahora, asumimos que el índice 'i' de locationCharts corresponde al índice 'i'
-          // de los canvas renderizados y capturados por @ViewChildren.
+          
+          
+          
+          
           return i < directivesArray.length ? directivesArray[i] : undefined;
         });
 
@@ -495,8 +495,8 @@ export class DashboardComponent implements OnInit {
         }
       }
     } else if (!this.isMultiChartView && this.singleChartCanvas) {
-      let chartLabel = 'Gráfico Filtrado'; // Etiqueta por defecto
-      // Intentar obtener una etiqueta más específica para el gráfico único
+      let chartLabel = 'Gráfico Filtrado'; 
+      
       if (this.singleLineChartData.datasets && this.singleLineChartData.datasets.length > 0 && this.singleLineChartData.datasets[0].label) {
         chartLabel = this.singleLineChartData.datasets[0].label;
       } else if (this.isSingleVariableAllInvernaderosView && this.filterVariableEntorno) {
@@ -532,7 +532,7 @@ export class DashboardComponent implements OnInit {
     };
 
     console.log('[Dashboard] ReportData construido con imágenes pre-capturadas. Llamando al servicio PDF...');
-    // Log para depuración (sin las directivas completas)
+    
     const reportDataForLog = {
       ...reportData,
       multiChartImages: reportData.multiChartImages?.map(img => ({...img, imageData: img.imageData ? 'Presente' : 'Ausente'})),
@@ -548,7 +548,7 @@ export class DashboardComponent implements OnInit {
       console.error('[Dashboard] Error al llamar a generateReport del servicio PDF:', error);
       alert('Ocurrió un error al intentar generar el reporte PDF.');
     } finally {
-      this.isLoading = false; // Ocultar indicador de carga
+      this.isLoading = false; 
     }
   }
 }

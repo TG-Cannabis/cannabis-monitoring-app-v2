@@ -72,10 +72,10 @@
   <div class="monitor-section">
     <h3>Últimas Alertas (Texto)</h3>
     <ul *ngIf="alertMessages.length > 0; else noAlerts">
-      <li *ngFor="let alert of alertMessages" class="alert-message alert-{{alert.level.toLowerCase()}}">
-        <strong>Alerta {{ alert.level || 'INFO' }}:</strong> {{ alert.message }}
+      <li *ngFor="let alert of alertMessages" class="alert-message alert-warning">
+        <strong>Alerta {{ alert.sensorType }}:</strong> {{ alert.alertType }}
         <br>
-        <small>Fuente: {{ alert.source || 'N/A' }}, Timestamp: {{ alert.timestamp | date:'mediumTime' }}</small>
+        <small>Fuente: {{ alert.currentValue}}</small>
       </li>
     </ul>
     <ng-template #noAlerts><p>Esperando alertas...</p></ng-template>

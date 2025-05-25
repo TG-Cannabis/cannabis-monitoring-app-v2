@@ -78,7 +78,7 @@ export class MonitoringComponent implements OnInit, OnDestroy, AfterViewInit {
     },
     interaction: { mode: 'nearest', axis: 'x', intersect: false },
   };
-  public sensorLineChartType: 'line' = 'line'; // Tipo de gráfico explícito
+  public sensorLineChartType: 'line' = 'line'; 
 
   private initialConnectionAttemptMade = false;
   private colorMap: { [key: string]: string } = {};
@@ -176,7 +176,7 @@ export class MonitoringComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filterInvernadero = '';
     this.filterStartDate = '';
     this.filterEndDate = '';
-    this.colorMap = {}; // Resetear colores si se limpian filtros para reasignarlos
+    this.colorMap = {}; 
     this.colorIndex = 0;
     this.processAndDisplayData();
   }
@@ -225,7 +225,7 @@ export class MonitoringComponent implements OnInit, OnDestroy, AfterViewInit {
       const sortedPoints = datasetsMap[seriesKey].sort((a, b) => a.x - b.x);
       const pointsForChart = sortedPoints.slice(-this.MAX_CHART_POINTS_PER_SERIES);
 
-      if (pointsForChart.length > 0) { // Solo añadir series con datos
+      if (pointsForChart.length > 0) { 
         const color = this.getSeriesColor(seriesKey);
         newChartDatasets.push({
           data: pointsForChart,
@@ -241,7 +241,7 @@ export class MonitoringComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
 
-    this.sensorLineChartData.datasets = newChartDatasets; // Cambio de referencia
+    this.sensorLineChartData.datasets = newChartDatasets; 
 
     if (this.chart && this.chart.chart) {
       this.chart.update('none');
@@ -259,7 +259,7 @@ export class MonitoringComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
-    // El servicio MonitoringService se encarga de su propia limpieza si es un singleton.
+    
   }
 
   attemptReconnect(): void {

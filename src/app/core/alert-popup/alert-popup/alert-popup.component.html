@@ -1,0 +1,18 @@
+<div class="alert-popup-overlay" *ngIf="isVisible && alertData">
+  <div class="alert-popup-content alert-{{alertData.level.toLowerCase()}}">
+    <button class="close-button" (click)="close()">&times;</button>
+    <h4>Alerta: {{ alertData.level }} <span *ngIf="alertData.alertType">({{alertData.alertType}})</span></h4>
+    <p class="alert-message-main">{{ alertData.message }}</p>
+
+    <div class="alert-details">
+      <small *ngIf="alertData.sensorType"><b>Tipo de Sensor:</b> {{ alertData.sensorType }}</small>
+      <small *ngIf="alertData.sensorId"><b>ID del Sensor:</b> {{ alertData.sensorId }}</small>
+      <small *ngIf="alertData.currentValue !== undefined"><b>Valor Actual:</b> {{ alertData.currentValue }}</small>
+      <small *ngIf="alertData.source && alertData.source !== alertData.sensorId && alertData.source !== alertData.sensorType">
+        <b>Fuente:</b> {{ alertData.source }}
+      </small>
+      <small *ngIf="alertData.durationSeconds !== undefined"><b>Duración:</b> {{ alertData.durationSeconds }} segundos</small>
+      <small *ngIf="alertData.timestamp"><b>Timestamp:</b> {{ alertData.timestamp | date:'yyyy-MM-dd HH:mm:ss' }}</small>
+    </div>
+  </div>
+</div>

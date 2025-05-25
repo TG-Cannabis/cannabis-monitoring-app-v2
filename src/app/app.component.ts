@@ -10,5 +10,5 @@ import { RouterOutlet } from '@angular/router';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'mi-monitoring-app'; // O el nombre de tu proyecto
+  title = 'mi-monitoring-app'; 
 }
