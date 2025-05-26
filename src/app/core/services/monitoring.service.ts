@@ -3,9 +3,9 @@ import { Injectable, OnDestroy, inject } from '@angular/core';
 import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { environment } from '../../../environment/environment';
 import { AlertPopupService, AlertPopupData } from '../alert-popup/alert-popup/alert-popup.service';
 import { ToastNotificationService, Toast } from '../toast-notification/toast-notification/toast-notification.service';
+import { EnvService } from '../../services/env.service';
 
 export interface SensorMessage { 
   sensorId: string;
@@ -48,12 +48,13 @@ export class MonitoringService implements OnDestroy {
   private alertsSubject = new Subject<AlertMessage>();
   public alerts$: Observable<AlertMessage> = this.alertsSubject.asObservable();
 
-  private readonly WS_ENDPOINT = environment.wsUrl; //
+  private readonly WS_ENDPOINT : string; //
   private activeSubscriptions: { [topic: string]: StompSubscription } = {};
   private alertPopupService = inject(AlertPopupService);
   private toastNotificationService = inject(ToastNotificationService);
 
-  constructor() {
+  constructor(private envService: EnvService) {
+    this.WS_ENDPOINT = this.envService.wsUrl;
     this.client = new Client({
       webSocketFactory: () => new SockJS(this.WS_ENDPOINT), //
       debug: (str) => { //

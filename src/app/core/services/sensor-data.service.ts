@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { SensorData, ApiFilters } from '../models/sensor-data.model';
-import { environment } from '../../../environment/environment';
+import { EnvService } from '../../services/env.service';
 
 export interface AvailableTags {
   sensorTypes: string[];
@@ -14,8 +14,12 @@ export interface AvailableTags {
   providedIn: 'root'
 })
 export class SensorDataService {
-  private apiUrlBase = environment.apiUrl;
+  private readonly apiUrlBase;
   private http = inject(HttpClient);
+
+  constructor(private envService: EnvService) {
+    this.apiUrlBase = this.envService.apiUrl;
+  }
 
   getSensorData(filters: ApiFilters = {}): Observable<SensorData[]> {
     const sensorDataUrl = `${this.apiUrlBase}/sensorData`;

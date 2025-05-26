@@ -16,6 +16,13 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=build /app/dist/mi-monitoring-app/browser /usr/share/nginx/html/mi-monitoring-app
 
+# Copiar template del env.js
+COPY ./src/assets/env.template.js /usr/share/nginx/html/mi-monitoring-app/assets/env.template.js
+
+# Entrypoint que genera el env.js real
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/entrypoint.sh"]
