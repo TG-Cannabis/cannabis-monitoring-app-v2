@@ -209,7 +209,7 @@ export class MonitoringComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const datasetsMap: { [key: string]: ChartPoint[] } = {};
     filteredMessages.forEach(msg => {
-      const seriesKey = `${msg.location || 'N/A'}-${msg.sensorType || 'N/A'}-${msg.sensorId || 'N/A'}`;
+      const seriesKey = `${msg.sensorType || 'N/A'}`;
       if (!datasetsMap[seriesKey]) {
         datasetsMap[seriesKey] = [];
       }
