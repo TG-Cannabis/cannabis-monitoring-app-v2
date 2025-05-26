@@ -1,0 +1,10 @@
+services:
+  monitoring-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - API_URL=${API_URL}
+      - WS_URL=${WS_URL}
